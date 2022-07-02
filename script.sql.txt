@@ -1,0 +1,47 @@
+use project;
+go
+
+EXEC sp_configure 'show advanced options', 1;
+RECONFIGURE;
+
+EXEC sp_configure 'clr strict security', 0;
+RECONFIGURE;
+
+ALTER DATABASE [project] SET trustworthy ON
+
+ALTER ASSEMBLY [Database1]
+   WITH PERMISSION_SET = UNSAFE;
+
+
+CREATE TABLE Accounts (
+	id int IDENTITY(1,1) PRIMARY KEY,
+	mail dbo.MyEmail,
+	rgb dbo.CardRGB,
+	acc dbo.AccNumber,
+	bal NUMERIC(9,2));
+
+CREATE TABLE Transactions (
+	id int IDENTITY(1,1) PRIMARY KEY,
+	id_acc int,
+	com dbo.Commission,
+	FOREIGN KEY (id_acc) REFERENCES Accounts(id));
+
+drop table Transactions;
+drop table Accounts;
+
+insert into Accounts (mail, rgb, acc, bal) values ('konto@test.pl', '30,77,199', 'PL.102030.PLN', 0)
+insert into Accounts (mail, rgb, acc, bal) values ('test@konto2.pl', '99,233,43', 'DE.987654.EUR', 0)
+insert into Accounts (mail, rgb, acc, bal) values ('lekarz@lekarski.pl', '3,66,42', 'PL.456321.PLN', 0)
+
+INSERT INTO Transactions (id_acc, com) VALUES (3 , 'DEP;6,63;777;PLN');
+UPDATE Accounts SET bal = bal + 725.48 WHERE id = 3;
+INSERT INTO Transactions (id_acc, com) VALUES (3 , 'WIT;2;73;PLN');
+UPDATE Accounts SET bal = bal - 74.46 WHERE id = 3;
+INSERT INTO Transactions (id_acc, com) VALUES (1 , 'DEP;9,68;87,68;PLN');
+UPDATE Accounts SET bal = bal + 79.19 WHERE id = 1;
+INSERT INTO Transactions (id_acc, com) VALUES (1 , 'WIT;3,44;25,25;PLN');
+UPDATE Accounts SET bal = bal - 26.12 WHERE id = 1;
+INSERT INTO Transactions (id_acc, com) VALUES (2 , 'DEP;10;99,99;EUR');
+UPDATE Accounts SET bal = bal + 89.99 WHERE id = 2;
+INSERT INTO Transactions (id_acc, com) VALUES (2 , 'WIT;9,99;26,78;EUR');
+UPDATE Accounts SET bal = bal - 29.46 WHERE id = 2;
